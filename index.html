@@ -165,6 +165,9 @@
 
   .intro p { color: var(--blue-line); line-height: 1.7; max-width: 68ch; font-size: 15px; }
 
+  .intro p.invite { font-size: 12.5px; opacity: 0.7; margin-top: -6px; }
+  .intro p.invite a { color: inherit; text-underline-offset: 3px; }
+
   .topic-list {
     display: flex;
     flex-wrap: wrap;
@@ -180,6 +183,88 @@
     color: var(--paper);
     border: 1px solid var(--blue-line);
     padding: 6px 12px;
+  }
+
+  /* ---------- PROJECT FILTERS ---------- */
+
+  .project-tools {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    padding: 28px 28px 6px;
+    flex-wrap: wrap;
+  }
+
+  .filters {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+  }
+
+  .filter {
+    appearance: none;
+    border: 1px solid var(--blue-line);
+    background: transparent;
+    color: var(--blue-line);
+    padding: 7px 11px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    cursor: pointer;
+  }
+
+  .filter:hover,
+  .filter.active {
+    background: var(--paper);
+    color: var(--blue-deep);
+  }
+
+  .search {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    border-bottom: 1px solid var(--blue-line);
+    padding: 5px 2px;
+    min-width: 190px;
+  }
+
+  .search span {
+    font-size: 18px;
+    color: var(--blue-line);
+  }
+
+  .search input {
+    width: 100%;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--paper);
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+
+  .search input::placeholder {
+    color: var(--blue-line);
+  }
+
+  .sheet.hidden {
+    display: none;
+  }
+
+  .student-work {
+    display: inline-block;
+    margin-top: 2px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-decoration: none;
+    color: var(--ink);
+    border: 1px solid var(--ink);
+    padding: 9px 13px;
+  }
+
+  .student-work:hover {
+    background: var(--ink);
+    color: var(--paper);
   }
 
   /* ---------- PROJECT SHEETS ---------- */
@@ -202,14 +287,20 @@
     border: 1px solid #D8D3C2;
   }
 
-  .sheet::before, .sheet::after, .sheet .cm-l, .sheet .cm-r {
-    content: "";
+  .sheet::before,
+  .sheet::after,
+  .sheet .cm-l,
+  .sheet .cm-r {
     position: absolute;
     width: 14px;
     height: 14px;
     border: 2px solid var(--blue-deep);
     opacity: 0.55;
   }
+
+  .sheet::before,
+  .sheet::after { content: ""; }
+
   .sheet::before { top: 8px; left: 8px; border-right: none; border-bottom: none; }
   .sheet::after { top: 8px; right: 8px; border-left: none; border-bottom: none; }
   .sheet .cm-l { bottom: 8px; left: 8px; border-right: none; border-top: none; }
@@ -219,6 +310,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 6px 14px;
     padding: 14px 26px;
     border-bottom: 1px solid #D8D3C2;
     font-family: var(--font-mono);
@@ -227,6 +320,12 @@
   }
 
   .discipline { color: var(--amber-dark); font-weight: 500; }
+
+  .diff { display: inline-flex; align-items: center; gap: 5px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.03em; }
+  .diff .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .diff.easy { color: #4C8C7D; } .diff.easy .dot { background: #4C8C7D; }
+  .diff.mod { color: var(--amber); } .diff.mod .dot { background: var(--amber); }
+  .diff.hard { color: #B5563C; } .diff.hard .dot { background: #B5563C; }
 
   .sheet-body { padding: 24px 26px 26px; }
 
@@ -314,6 +413,25 @@
     font-size: 12px;
     color: var(--blue-line);
   }
+
+  /* ---------- AUTHOR ---------- */
+
+  footer .author {
+    margin-top: 22px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    align-items: baseline;
+  }
+
+  footer .author .name {
+    color: var(--paper);
+    font-size: 13px;
+  }
+
+  footer .author a {
+    color: var(--paper);
+    text-underline-offset: 3px;
+  }
 </style>
 </head>
 <body>
@@ -325,8 +443,8 @@
         <h1>Where math lands</h1>
         <p class="lede">Real projects by our students. Each one uses an idea from the math course to solve something real. This set starts with flight; wherever the next one leads, it'll land here too.</p>
         <div class="hero-figures">
-          <div class="figure"><span class="n">06</span><span class="l">projects on file</span></div>
-          <div class="figure"><span class="n">04</span><span class="l">math topics covered</span></div>
+          <div class="figure"><span class="n" id="projectCount">09</span><span class="l">projects on file</span></div>
+          <div class="figure"><span class="n" id="topicCount">04</span><span class="l">math topics covered</span></div>
           <div class="figure"><span class="n">Y1</span><span class="l">current cohort</span></div>
         </div>
       </div>
@@ -364,8 +482,9 @@
 
   <section class="intro">
     <div class="frame">
-      <h2>Six projects, four topics</h2>
+      <h2>Nine projects, four topics</h2>
       <p>Each sheet below names the project, links to the full write-up in Google Drive, and lists the students who worked on it. More projects will be added here as students choose topics through the year.</p>
+      <p class="invite">Interested in a project and have a solution? You're welcome to <a href="mailto:kaveheft@gmail.com?subject=Where%20Math%20Lands%20%E2%80%94%20solution">get in touch</a> and I'll add your work here.</p>
       <ul class="topic-list">
         <li>Linear Algebra</li>
         <li>Analytic Geometry</li>
@@ -375,137 +494,236 @@
     </div>
   </section>
 
+  <section class="project-tools frame">
+    <div class="filters" role="tablist" aria-label="Project topics">
+      <button class="filter active" data-filter="all">ALL</button>
+      <button class="filter" data-filter="linear">LINEAR ALGEBRA</button>
+      <button class="filter" data-filter="geometry">ANALYTIC GEOMETRY</button>
+      <button class="filter" data-filter="analysis">MATHEMATICAL ANALYSIS</button>
+      <button class="filter" data-filter="ode">DIFFERENTIAL EQUATIONS</button>
+    </div>
+
+    <label class="search">
+      <span>⌕</span>
+      <input id="projectSearch" type="search" placeholder="Search projects…" aria-label="Search projects">
+    </label>
+  </section>
+
   <section class="sheets frame">
 
-    <article class="sheet">
+    <!-- AE-101: WEIGHT AND BALANCE -->
+    <article class="sheet" data-category="linear" data-search="aircraft weight balance linear algebra loading moment station envelope datum">
       <span class="cm-l"></span><span class="cm-r"></span>
       <div class="sheet-strip">
         <span class="discipline">Linear Algebra</span>
-        <span>DWG NO. AE-101 · SHEET 1 OF 6</span>
+        <span class="diff hard"><span class="dot"></span>CHALLENGING</span>
+        <span>DWG NO. AE-101 &middot; SHEET 1 OF 9</span>
       </div>
       <div class="sheet-body">
         <h3>Aircraft weight and balance</h3>
         <div class="icon-row">
           <div class="icon-slot">
-            <svg viewBox="0 0 40 40" fill="none"><path d="M8 30h24M20 30V10M12 16l8-6 8 6" stroke="#10203A" stroke-width="1.6"/><circle cx="12" cy="24" r="4" stroke="#10203A" stroke-width="1.6"/><circle cx="28" cy="24" r="4" stroke="#10203A" stroke-width="1.6"/></svg>
+            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 30h24M20 30V10M12 16l8-6 8 6" stroke="#10203A" stroke-width="1.6"/><circle cx="12" cy="24" r="4" stroke="#10203A" stroke-width="1.6"/><circle cx="28" cy="24" r="4" stroke="#10203A" stroke-width="1.6"/></svg>
           </div>
           <a class="project-dl" href="https://drive.google.com/file/d/1UN3oAfExEoUboF885ZadvSJEiZSBoXnp/view?usp=drive_link" target="_blank" rel="noopener">DOWNLOAD PROJECT — GOOGLE DRIVE ↗</a>
         </div>
         <p class="desc">Every seat, bag and fuel tank adds weight to the plane. A few simple equations help us check that the plane stays balanced and safe to fly.</p>
         <div class="contributors">
           <span class="contrib-label">CONTRIBUTORS</span>
-          <div class="contrib-row"><span>Valerii Havryliuk</span><a href="https://drive.google.com/file/d/1jH476mIuMmoJdiczMRBqYBbSpFtyNTEl/view?usp=drive_link" target="_blank" rel="noopener">Download ↗</a></div>
-          <div class="contrib-row"><span>[Student name]</span><a href="#" target="_blank" rel="noopener">Download ↗</a></div>
+          <div class="contrib-row"><span>Valerii Havryliuk</span><a class="student-work" href="https://drive.google.com/file/d/1jH476mIuMmoJdiczMRBqYBbSpFtyNTEl/view?usp=drive_link" target="_blank" rel="noopener">View work ↗</a></div>
+          <div class="contrib-row"><span>[Student name]</span><a class="student-work" href="#" target="_blank" rel="noopener">View work ↗</a></div>
         </div>
       </div>
     </article>
 
-    <article class="sheet">
+    <!-- AE-102: CROSS PRODUCTS -->
+    <article class="sheet" data-category="geometry" data-search="cross products physics engineering analytic geometry torque wrench lorentz force vector determinant">
       <span class="cm-l"></span><span class="cm-r"></span>
       <div class="sheet-strip">
         <span class="discipline">Analytic Geometry</span>
-        <span>DWG NO. AE-102 · SHEET 2 OF 6</span>
+        <span class="diff easy"><span class="dot"></span>STRAIGHTFORWARD</span>
+        <span>DWG NO. AE-102 &middot; SHEET 2 OF 9</span>
       </div>
       <div class="sheet-body">
         <h3>Cross products in physics and engineering</h3>
         <div class="icon-row">
           <div class="icon-slot">
-            <svg viewBox="0 0 40 40" fill="none"><path d="M6 30 L26 12" stroke="#10203A" stroke-width="1.6"/><path d="M26 12l-7 1M26 12l0 7" stroke="#10203A" stroke-width="1.6"/><path d="M6 30 L30 26" stroke="#10203A" stroke-width="1.6"/><path d="M30 26l-6-3M30 26l-3 6" stroke="#10203A" stroke-width="1.6"/><path d="M6 30 L18 6" stroke="#E0983B" stroke-width="1.6" stroke-dasharray="3 2"/><path d="M18 6l-4 3M18 6l4 2" stroke="#E0983B" stroke-width="1.6"/></svg>
+            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 30 L26 12" stroke="#10203A" stroke-width="1.6"/><path d="M26 12l-7 1M26 12l0 7" stroke="#10203A" stroke-width="1.6"/><path d="M6 30 L30 26" stroke="#10203A" stroke-width="1.6"/><path d="M30 26l-6-3M30 26l-3 6" stroke="#10203A" stroke-width="1.6"/><path d="M6 30 L18 6" stroke="#E0983B" stroke-width="1.6" stroke-dasharray="3 2"/><path d="M18 6l-4 3M18 6l4 2" stroke="#E0983B" stroke-width="1.6"/></svg>
           </div>
           <a class="project-dl" href="https://drive.google.com/file/d/1UzokUaMPGR0Cx7FtZonmSkQn6sjNJlcu/view?usp=drive_link" target="_blank" rel="noopener">DOWNLOAD PROJECT — GOOGLE DRIVE ↗</a>
         </div>
         <p class="desc">The cross product appears in real life: turning a bolt with a wrench, a charge moving in a magnetic field, a spinning rotor. Each example is worked out step by step.</p>
         <div class="contributors">
           <span class="contrib-label">CONTRIBUTORS</span>
-          <div class="contrib-row"><span>[Student name]</span><a href="#" target="_blank" rel="noopener">Download ↗</a></div>
+          <div class="contrib-row"><span>[Student name]</span><a class="student-work" href="#" target="_blank" rel="noopener">View work ↗</a></div>
         </div>
       </div>
     </article>
 
-    <article class="sheet">
+    <!-- AE-103: GLIDE SLOPE DEVIATION -->
+    <article class="sheet" data-category="geometry" data-search="glide slope deviation ILS line point distance analytic geometry approach">
       <span class="cm-l"></span><span class="cm-r"></span>
       <div class="sheet-strip">
         <span class="discipline">Analytic Geometry</span>
-        <span>DWG NO. AE-103 · SHEET 3 OF 6</span>
+        <span class="diff mod"><span class="dot"></span>MODERATE</span>
+        <span>DWG NO. AE-103 &middot; SHEET 3 OF 9</span>
       </div>
       <div class="sheet-body">
         <h3>Glide slope deviation</h3>
         <div class="icon-row">
           <div class="icon-slot">
-            <svg viewBox="0 0 40 40" fill="none"><path d="M6 10 L34 30" stroke="#10203A" stroke-width="1.6"/><circle cx="24" cy="14" r="2.2" fill="#E0983B"/><path d="M24 14 L28.6 21.2" stroke="#E0983B" stroke-width="1.6" stroke-dasharray="2 2"/><circle cx="6" cy="10" r="1.6" fill="#10203A"/><circle cx="34" cy="30" r="1.6" fill="#10203A"/></svg>
+            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 10 L34 30" stroke="#10203A" stroke-width="1.6"/><circle cx="24" cy="14" r="2.2" fill="#E0983B"/><path d="M24 14 L28.6 21.2" stroke="#E0983B" stroke-width="1.6" stroke-dasharray="2 2"/><circle cx="6" cy="10" r="1.6" fill="#10203A"/><circle cx="34" cy="30" r="1.6" fill="#10203A"/></svg>
           </div>
           <a class="project-dl" href="https://drive.google.com/file/d/1y7EotTEO3Tbz8eTCVC0scPd8YejBIDT8/view?usp=drive_link" target="_blank" rel="noopener">DOWNLOAD PROJECT — GOOGLE DRIVE ↗</a>
         </div>
         <p class="desc">The landing path is a straight line down to the runway. We measure how far above or below that line the plane is.</p>
         <div class="contributors">
           <span class="contrib-label">CONTRIBUTORS</span>
-          <div class="contrib-row"><span>[Student name]</span><a href="#" target="_blank" rel="noopener">Download ↗</a></div>
+          <div class="contrib-row"><span>[Student name]</span><a class="student-work" href="#" target="_blank" rel="noopener">View work ↗</a></div>
         </div>
       </div>
     </article>
 
-    <article class="sheet">
+    <!-- AE-104: RUNWAY OBSTACLE CLEARANCE -->
+    <article class="sheet" data-category="geometry" data-search="runway obstacle clearance surface plane three points analytic geometry normal vector">
       <span class="cm-l"></span><span class="cm-r"></span>
       <div class="sheet-strip">
         <span class="discipline">Analytic Geometry</span>
-        <span>DWG NO. AE-104 · SHEET 4 OF 6</span>
+        <span class="diff mod"><span class="dot"></span>MODERATE</span>
+        <span>DWG NO. AE-104 &middot; SHEET 4 OF 9</span>
       </div>
       <div class="sheet-body">
         <h3>Runway obstacle clearance</h3>
         <div class="icon-row">
           <div class="icon-slot">
-            <svg viewBox="0 0 40 40" fill="none"><path d="M4 26 L18 18 L36 22 L22 30 Z" stroke="#10203A" stroke-width="1.6"/><path d="M20 24 L20 8" stroke="#10203A" stroke-width="1.6"/><path d="M20 8l-3 4M20 8l3 4" stroke="#10203A" stroke-width="1.6"/><circle cx="30" cy="12" r="2.2" fill="#E0983B"/></svg>
+            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 26 L18 18 L36 22 L22 30 Z" stroke="#10203A" stroke-width="1.6"/><path d="M20 24 L20 8" stroke="#10203A" stroke-width="1.6"/><path d="M20 8l-3 4M20 8l3 4" stroke="#10203A" stroke-width="1.6"/><circle cx="30" cy="12" r="2.2" fill="#E0983B"/></svg>
           </div>
           <a class="project-dl" href="https://drive.google.com/file/d/1h3xoYH1VFJy3Io_JHp4n_V5oFViOF6vg/view?usp=drive_link" target="_blank" rel="noopener">DOWNLOAD PROJECT — GOOGLE DRIVE ↗</a>
         </div>
         <p class="desc">Around a runway there are invisible flat surfaces that nothing should poke through. We check whether a tower or a tree stays safely below them.</p>
         <div class="contributors">
           <span class="contrib-label">CONTRIBUTORS</span>
-          <div class="contrib-row"><span>[Student name]</span><a href="#" target="_blank" rel="noopener">Download ↗</a></div>
+          <div class="contrib-row"><span>[Student name]</span><a class="student-work" href="#" target="_blank" rel="noopener">View work ↗</a></div>
         </div>
       </div>
     </article>
 
-    <article class="sheet">
+    <!-- AE-105: AIRCRAFT BRACING -->
+    <article class="sheet" data-category="linear" data-search="aircraft bracing spar truss forces linear system matrix equilibrium structural joints">
       <span class="cm-l"></span><span class="cm-r"></span>
       <div class="sheet-strip">
         <span class="discipline">Linear Algebra</span>
-        <span>DWG NO. AE-105 · SHEET 5 OF 6</span>
+        <span class="diff hard"><span class="dot"></span>CHALLENGING</span>
+        <span>DWG NO. AE-105 &middot; SHEET 5 OF 9</span>
       </div>
       <div class="sheet-body">
         <h3>Aircraft bracing</h3>
         <div class="icon-row">
           <div class="icon-slot">
-            <svg viewBox="0 0 40 40" fill="none"><path d="M6 32h28M8 32V12h24v20" stroke="#10203A" stroke-width="1.6"/><path d="M8 12l24 20M32 12L8 32" stroke="#E0983B" stroke-width="1.6"/></svg>
+            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 32 L32 32 L32 10 L8 10 Z" stroke="#10203A" stroke-width="1.6"/><path d="M8 32 L32 10" stroke="#10203A" stroke-width="1.6"/><circle cx="8" cy="32" r="2.5" fill="#E0983B"/><circle cx="32" cy="10" r="2.5" fill="#E0983B"/></svg>
           </div>
           <a class="project-dl" href="https://drive.google.com/file/d/1RC7ZsW-rr_neezsFuMUbmO4PShkI_QNI/view?usp=drive_link" target="_blank" rel="noopener">DOWNLOAD PROJECT — GOOGLE DRIVE ↗</a>
         </div>
         <p class="desc">Bracing keeps a structure from wobbling or falling down. We use simple equations to find how much force each brace has to carry.</p>
         <div class="contributors">
           <span class="contrib-label">CONTRIBUTORS</span>
-          <div class="contrib-row"><span>[Student name]</span><a href="#" target="_blank" rel="noopener">Download ↗</a></div>
+          <div class="contrib-row"><span>[Student name]</span><a class="student-work" href="#" target="_blank" rel="noopener">View work ↗</a></div>
         </div>
       </div>
     </article>
 
-    <article class="sheet">
+    <!-- AE-106: AIRCRAFT FUELING -->
+    <article class="sheet" data-category="ode" data-search="aircraft fueling tanks center of gravity flow rate differential equations lateral balance">
       <span class="cm-l"></span><span class="cm-r"></span>
       <div class="sheet-strip">
         <span class="discipline">Differential Equations</span>
-        <span>DWG NO. AE-106 · SHEET 6 OF 6</span>
+        <span class="diff mod"><span class="dot"></span>MODERATE</span>
+        <span>DWG NO. AE-106 &middot; SHEET 6 OF 9</span>
       </div>
       <div class="sheet-body">
         <h3>Aircraft fueling</h3>
         <div class="icon-row">
           <div class="icon-slot">
-            <svg viewBox="0 0 40 40" fill="none"><path d="M10 8h14v26H10z" stroke="#10203A" stroke-width="1.6"/><path d="M10 22h14" stroke="#E0983B" stroke-width="1.6"/><path d="M24 14h6l3 4v10" stroke="#10203A" stroke-width="1.6"/></svg>
+            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 28h28M12 28V14h16v14M20 14V8M16 8h8" stroke="#10203A" stroke-width="1.6"/><path d="M10 20h20" stroke="#E0983B" stroke-width="1.4" stroke-dasharray="2 2"/></svg>
           </div>
           <a class="project-dl" href="https://drive.google.com/file/d/1ekALEJvDR_L_KoWScL2y6oZic-oyF4Ca/view?usp=drive_link" target="_blank" rel="noopener">DOWNLOAD PROJECT — GOOGLE DRIVE ↗</a>
         </div>
         <p class="desc">Filling a tank takes time. We use math to see how the fuel level changes while a plane is being fueled, and how long it takes.</p>
         <div class="contributors">
           <span class="contrib-label">CONTRIBUTORS</span>
-          <div class="contrib-row"><span>[Student name]</span><a href="#" target="_blank" rel="noopener">Download ↗</a></div>
+          <div class="contrib-row"><span>[Student name]</span><a class="student-work" href="#" target="_blank" rel="noopener">View work ↗</a></div>
+        </div>
+      </div>
+    </article>
+
+    <!-- AE-107: PHUGOID OSCILLATION -->
+    <article class="sheet" data-category="analysis" data-search="phugoid oscillation altitude speed damping product rule chain rule derivative acceleration mathematical analysis">
+      <span class="cm-l"></span><span class="cm-r"></span>
+      <div class="sheet-strip">
+        <span class="discipline">Mathematical Analysis</span>
+        <span class="diff mod"><span class="dot"></span>MODERATE</span>
+        <span>DWG NO. AE-107 &middot; SHEET 7 OF 9</span>
+      </div>
+      <div class="sheet-body">
+        <h3>The phugoid oscillation</h3>
+        <div class="icon-row">
+          <div class="icon-slot">
+            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 20 C6 6 10 6 12 20 C14 34 17 34 19 20 C21 11 23 11 25 20 C26 27 28 27 29 20 C30 17 31 17 32 20 L36 20" stroke="#10203A" stroke-width="1.6"/><path d="M4 20 C14 10 24 15 36 20" stroke="#E0983B" stroke-width="1.2" stroke-dasharray="3 2"/></svg>
+          </div>
+          <a class="project-dl" href="https://drive.google.com/file/d/18u939Wg90VfEqCw2gAQu7alfmtjBE6vP/view?usp=drive_link" target="_blank" rel="noopener">DOWNLOAD PROJECT — GOOGLE DRIVE ↗</a>
+        </div>
+        <p class="desc">After a gust, a plane can slowly rise and fall like a roller coaster, trading height for speed. We use derivatives to find how fast it moves up and down, and how hard the pilot feels it.</p>
+        <div class="contributors">
+          <span class="contrib-label">CONTRIBUTORS</span>
+          <div class="contrib-row"><span>[Student name]</span><a class="student-work" href="#" target="_blank" rel="noopener">View work ↗</a></div>
+        </div>
+      </div>
+    </article>
+
+    <!-- AE-108: ZOOM CLIMB AND SPECIFIC ENERGY -->
+    <article class="sheet" data-category="analysis" data-search="zoom climb specific energy chain rule derivative kinetic potential energy drag mathematical analysis">
+      <span class="cm-l"></span><span class="cm-r"></span>
+      <div class="sheet-strip">
+        <span class="discipline">Mathematical Analysis</span>
+        <span class="diff mod"><span class="dot"></span>MODERATE</span>
+        <span>DWG NO. AE-108 &middot; SHEET 8 OF 9</span>
+      </div>
+      <div class="sheet-body">
+        <h3>Zoom climb and specific energy</h3>
+        <div class="icon-row">
+          <div class="icon-slot">
+            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 34 C10 34 14 28 18 18 C22 8 28 6 34 6" stroke="#10203A" stroke-width="1.6"/><path d="M34 6 L34 34" stroke="#E0983B" stroke-width="1.4" stroke-dasharray="3 2"/><circle cx="34" cy="6" r="2.3" fill="#E0983B"/></svg>
+          </div>
+          <a class="project-dl" href="https://drive.google.com/file/d/1Vp-UPHKcZUzIDS3b0wD7wmseONgfVcBL/view?usp=drive_link" target="_blank" rel="noopener">DOWNLOAD PROJECT — GOOGLE DRIVE ↗</a>
+        </div>
+        <p class="desc">In a zoom climb a pilot trades speed for height. Using the chain rule, we follow the plane's total energy to see how much is lost along the way.</p>
+        <div class="contributors">
+          <span class="contrib-label">CONTRIBUTORS</span>
+          <div class="contrib-row"><span>[Student name]</span><a class="student-work" href="#" target="_blank" rel="noopener">View work ↗</a></div>
+        </div>
+      </div>
+    </article>
+
+    <!-- AE-109: FUEL BURN AND MOMENTUM -->
+    <article class="sheet" data-category="analysis" data-search="fuel burn variable mass momentum product rule derivative force thrust mathematical analysis">
+      <span class="cm-l"></span><span class="cm-r"></span>
+      <div class="sheet-strip">
+        <span class="discipline">Mathematical Analysis</span>
+        <span class="diff mod"><span class="dot"></span>MODERATE</span>
+        <span>DWG NO. AE-109 &middot; SHEET 9 OF 9</span>
+      </div>
+      <div class="sheet-body">
+        <h3>Fuel burn and momentum</h3>
+        <div class="icon-row">
+          <div class="icon-slot">
+            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 6 C11 15 9 19 9 24 a7 7 0 0 0 14 0 C23 19 21 15 16 6 Z" stroke="#10203A" stroke-width="1.6"/><path d="M27 22 h9 m-3.5 -3.5 l3.5 3.5 -3.5 3.5" stroke="#E0983B" stroke-width="1.6"/></svg>
+          </div>
+          <a class="project-dl" href="https://drive.google.com/file/d/1HYqOOiejcgY9QTS_R0ZnaGt2-oFQSpp2/view?usp=drive_link" target="_blank" rel="noopener">DOWNLOAD PROJECT — GOOGLE DRIVE ↗</a>
+        </div>
+        <p class="desc">A jet gets lighter as it burns fuel, so its momentum changes in two ways at once. The product rule shows how much each part contributes.</p>
+        <div class="contributors">
+          <span class="contrib-label">CONTRIBUTORS</span>
+          <div class="contrib-row"><span>[Student name]</span><a class="student-work" href="#" target="_blank" rel="noopener">View work ↗</a></div>
         </div>
       </div>
     </article>
@@ -515,9 +733,66 @@
   <footer>
     <div class="frame">
       <span>WHERE MATH LANDS — STUDENT PROJECTS</span>
-      <span>DWG SERIES AE-100 · REV D</span>
+      <span>DWG SERIES AE-100 · REV G</span>
+    </div>
+    <div class="frame author">
+      <span><span class="name">Kaveh Eftekharinasab</span> · Higher Mathematics Department, National Aviation University, Kyiv</span>
+      <a href="mailto:kaveheft@gmail.com">kaveheft@gmail.com</a>
     </div>
   </footer>
+
+<script>
+(function () {
+  const sheets = Array.from(document.querySelectorAll(".sheet"));
+  const filters = Array.from(document.querySelectorAll(".filter"));
+  const search = document.getElementById("projectSearch");
+  const projectCount = document.getElementById("projectCount");
+  const topicCount = document.getElementById("topicCount");
+
+  const topics = new Set(
+    sheets.map(sheet => sheet.dataset.category).filter(Boolean)
+  );
+
+  if (projectCount) projectCount.textContent = String(sheets.length).padStart(2, "0");
+  if (topicCount) topicCount.textContent = String(topics.size).padStart(2, "0");
+
+  let activeFilter = "all";
+
+  function applyFilters() {
+    const query = (search ? search.value : "").trim().toLowerCase();
+
+    sheets.forEach(sheet => {
+      const category = sheet.dataset.category || "";
+      const searchable = (
+        (sheet.dataset.search || "") + " " +
+        (sheet.textContent || "")
+      ).toLowerCase();
+
+      const categoryMatch =
+        activeFilter === "all" || category === activeFilter;
+
+      const searchMatch =
+        !query || searchable.includes(query);
+
+      sheet.classList.toggle(
+        "hidden",
+        !(categoryMatch && searchMatch)
+      );
+    });
+  }
+
+  filters.forEach(button => {
+    button.addEventListener("click", function () {
+      filters.forEach(item => item.classList.remove("active"));
+      this.classList.add("active");
+      activeFilter = this.dataset.filter;
+      applyFilters();
+    });
+  });
+
+  if (search) search.addEventListener("input", applyFilters);
+})();
+</script>
 
 </body>
 </html>
